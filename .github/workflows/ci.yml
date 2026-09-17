@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # テスト専用のダミー値。本番の値は一切使わない。
+  TEST_DATABASE_URL: postgres://postgres:ci@localhost:5432/tommievoice_test
+  ADMIN_TOKEN: ci-only-admin-token-0000000000000000000000
+  HASH_KEY: ci-only-hash-key-000000000000000000000000000
+  SESSION_KEY: ci-only-session-key-00000000000000000000000
+  WORKER_TOKEN: ci-only-worker-token-0000000000000000000000
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_PASSWORD: ci
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run lint:md
+      - run: npm run typecheck
+      - run: npm run test:cov
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 7
+      - run: npm run build
+      - name: Validate compose files
+        run: docker compose -f compose.yml -f compose.prod.yml --env-file deploy/env.example config -q
+      - name: Build api image
+        run: docker build -f deploy/api.Dockerfile -t tommievoice-api:ci .
+      - name: Shell syntax
+        run: for f in do*.sh deploy/*.sh test/*.sh; do [ -f "$f" ] && bash -n "$f"; done
+
+  e2e:
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_PASSWORD: ci
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npm run build
+      - run: npm run test:e2e
+        env:
+          E2E_CHECK_DIST: '1'
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

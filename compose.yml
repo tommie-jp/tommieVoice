@@ -1,0 +1,106 @@
+# tommieVoice 本番相当の基本定義。
+# 開発: compose.override.yml が自動で重なる（db のみ常時起動）。
+# 本番: docker compose -f compose.yml -f compose.prod.yml ...
+name: tommievoice
+
+x-app-env: &app-env
+  env_file:
+    - path: .env
+      required: false
+
+x-hardening: &hardening
+  cap_drop: [ALL]
+  security_opt: ['no-new-privileges:true']
+
+services:
+  db:
+    image: postgres:17-alpine
+    <<: *app-env
+    command: postgres -c shared_buffers=64MB -c max_connections=40 -c work_mem=2MB
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  api:
+    image: tommievoice-api:${IMAGE_TAG:-dev}
+    build:
+      context: .
+      dockerfile: deploy/api.Dockerfile
+    <<: [*app-env, *hardening]
+    environment:
+      HOST: 0.0.0.0
+      PORT: '3000'
+      AUDIO_DIR: /data/audio
+    command: ['node', '--disable-warning=ExperimentalWarning', 'server/src/main.ts']
+    user: node
+    read_only: true
+    tmpfs:
+      - /tmp
+    volumes:
+      - ./data/audio:/data/audio
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://127.0.0.1:3000/api/healthz >/dev/null || exit 1']
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  worker:
+    image: tommievoice-api:${IMAGE_TAG:-dev}
+    <<: [*app-env, *hardening]
+    environment:
+      AUDIO_DIR: /data/audio
+      HEARTBEAT_FILE: /tmp/heartbeat
+    command: ['node', '--disable-warning=ExperimentalWarning', 'server/src/worker/main.ts']
+    user: node
+    read_only: true
+    tmpfs:
+      - /tmp
+    volumes:
+      - ./data/audio:/data/audio
+    depends_on:
+      db:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'test -f /tmp/heartbeat && test $$(( $$(date +%s) - $$(stat -c %Y /tmp/heartbeat) )) -lt 120',
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  web:
+    image: nginx:1.29-alpine
+    security_opt: ['no-new-privileges:true']
+    cap_drop: [ALL]
+    # nginx の master は root で起動し worker を nginx ユーザにする
+    cap_add: [CHOWN, SETUID, SETGID, NET_BIND_SERVICE, DAC_OVERRIDE]
+    volumes:
+      - ./dist:/usr/share/nginx/html:ro
+      - ./data/audio/public:/data/audio/public:ro
+      - ./deploy/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./deploy/nginx/security-headers.conf:/etc/nginx/snippets/security-headers.conf:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://127.0.0.1/healthz >/dev/null || exit 1']
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  pgdata:

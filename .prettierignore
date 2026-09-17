@@ -1,0 +1,10 @@
+node_modules
+dist
+dist-ssr
+*.local
+package-lock.json
+coverage
+playwright-report
+test-results
+data
+server/drizzle

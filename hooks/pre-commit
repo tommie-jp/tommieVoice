@@ -1,0 +1,25 @@
+#!/bin/bash
+# コミットごとに shared/appVersion.ts の APP_COMMIT_COUNTER を +1 する（単純増加）。
+#
+# 例: export const APP_COMMIT_COUNTER = '1'  →  '2'  →  '3'  ...
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+APP_VER="$REPO_ROOT/shared/appVersion.ts"
+
+if [ ! -f "$APP_VER" ]; then
+    exit 0
+fi
+
+cur=$(grep -oE "APP_COMMIT_COUNTER\s*=\s*'[0-9]+'" "$APP_VER" | grep -oE "[0-9]+" || true)
+if [ -z "$cur" ]; then
+    echo "[pre-commit] APP_COMMIT_COUNTER が見つからないためスキップ"
+    exit 0
+fi
+
+new=$((cur + 1))
+
+sed -i -E "s/(APP_COMMIT_COUNTER\s*=\s*')[0-9]+(')/\1$new\2/" "$APP_VER"
+git add "$APP_VER"
+
+echo "[pre-commit] APP_COMMIT_COUNTER: $cur → $new"

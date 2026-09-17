@@ -1,0 +1,1023 @@
+/* スマホファースト。基準は iPhone 幅（375〜430px）。PC は中央寄せで広げるだけ。 */
+:root {
+  --bg: #f5f5f7;
+  --surface: #ffffff;
+  --text: #1a1a1a;
+  --muted: #6e6e73;
+  --border: #e5e5ea;
+  --accent: #ff3b30;
+  --link: #0a64d8;
+  --radius: 14px;
+  --tap: 44px;
+  --safe-bottom: env(safe-area-inset-bottom);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    'Hiragino Kaku Gothic ProN',
+    Meiryo,
+    sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+/* iOS の自動ズームを防ぐため入力欄は 16px 以上 */
+input,
+textarea {
+  font-size: 16px;
+}
+
+a {
+  color: var(--link);
+}
+
+/* --- レイアウト --- */
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  padding-top: env(safe-area-inset-top);
+}
+
+.page-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: var(--tap) 1fr var(--tap);
+  align-items: center;
+  min-height: 48px;
+  padding: 0 4px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.page-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  text-align: center;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.back-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--tap);
+  min-height: var(--tap);
+  font-size: 32px;
+  line-height: 1;
+  text-decoration: none;
+  color: var(--link);
+}
+
+.header-action {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.page {
+  flex: 1;
+  width: 100%;
+  padding: 12px 16px 16px;
+}
+
+.lead {
+  margin: 4px 0 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.lead.small {
+  font-size: 12px;
+}
+
+.empty,
+.status-block {
+  text-align: center;
+  color: var(--muted);
+  padding: 32px 8px;
+}
+
+.notice {
+  background: #e8f5e9;
+  color: #1b5e20;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.app-foot {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 16px calc(200px + var(--safe-bottom));
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.app-version {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* --- カード --- */
+.card-list,
+.post-list,
+.admin-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 64px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: inherit;
+  text-decoration: none;
+}
+
+.card:active {
+  background: #eeeef2;
+}
+
+.card.is-closed {
+  opacity: 0.6;
+}
+
+.card-title {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.card-desc {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.card-meta {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.script-box {
+  background: #fffbe6;
+  border: 1px solid #f4e4a1;
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+}
+
+.script-box summary {
+  font-weight: 700;
+  font-size: 14px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+}
+
+.script-text {
+  white-space: pre-wrap;
+  line-height: 1.7;
+  margin: 6px 0 4px;
+}
+
+/* --- 投稿 --- */
+.post-row {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  scroll-margin: 72px;
+}
+
+.post-row.is-current {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent) inset;
+}
+
+.play-button {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-size: 18px;
+}
+
+.play-button:disabled {
+  background: #c7c7cc;
+}
+
+.post-body {
+  min-width: 0;
+}
+
+.post-meta {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.post-seq {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.post-author {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.post-title {
+  margin: 4px 0;
+  font-size: 15px;
+  word-break: break-word;
+}
+
+.post-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.anchor-link,
+.text-button {
+  background: none;
+  border: none;
+  color: var(--link);
+  padding: 8px 4px;
+  min-height: 36px;
+  font-size: 14px;
+}
+
+.post-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.text-button.muted {
+  color: var(--muted);
+}
+
+.reason-list {
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.reason-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--tap);
+  font-size: 15px;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.tab {
+  flex: 1;
+  min-height: 40px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 10px;
+}
+
+.tab.is-active {
+  background: var(--text);
+  color: #fff;
+}
+
+.report-row {
+  flex-direction: column;
+}
+
+.text-button.danger {
+  color: #d70015;
+}
+
+.anchor-link {
+  padding: 2px 0;
+  min-height: 0;
+  font-size: 13px;
+}
+
+/* --- ボタン --- */
+.primary-button,
+.secondary-button {
+  min-height: var(--tap);
+  border-radius: 12px;
+  padding: 0 18px;
+  font-weight: 700;
+}
+
+.primary-button {
+  border: none;
+  background: var(--accent);
+  color: #fff;
+}
+
+.primary-button:disabled {
+  background: #c7c7cc;
+}
+
+.secondary-button {
+  border: 1px solid #d1d1d6;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.secondary-button.wide {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.fab-area {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 20;
+  padding: 12px 16px calc(12px + var(--safe-bottom));
+  background: linear-gradient(to top, var(--bg) 60%, rgba(245, 245, 247, 0));
+}
+
+.fab {
+  width: 100%;
+  min-height: 52px;
+  font-size: 16px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+
+.closed-note {
+  text-align: center;
+  color: var(--muted);
+}
+
+/* --- シート（録音・投稿） --- */
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: flex-end;
+}
+
+.sheet {
+  width: 100%;
+  max-height: 92dvh;
+  overflow-y: auto;
+  background: var(--surface);
+  border-radius: 18px 18px 0 0;
+  padding: 12px 16px calc(16px + var(--safe-bottom));
+  outline: none;
+}
+
+.sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sheet-title {
+  margin: 0;
+  font-size: 17px;
+}
+
+.sheet-note {
+  margin: 4px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.sheet-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 15px;
+  margin: 8px 0;
+}
+
+.field-label {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+.text-input {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 8px 12px;
+  border: 1px solid #d1d1d6;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.recorder-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 0 8px;
+}
+
+.recorder-hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.preview {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.preview-audio {
+  width: 100%;
+  height: 40px;
+}
+
+.preview-meta {
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.form-error {
+  background: #ffe8e6;
+  color: #b42318;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  margin: 6px 0;
+}
+
+.consent-note {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 4px 0 0;
+  text-align: center;
+}
+
+/* --- プレイヤー --- */
+.player-bar {
+  position: fixed;
+  inset-inline: 8px;
+  bottom: calc(80px + var(--safe-bottom));
+  z-index: 30;
+  display: grid;
+  grid-template-columns: var(--tap) 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(28, 28, 30, 0.94);
+  color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.player-toggle,
+.player-rate,
+.player-close {
+  min-width: var(--tap);
+  min-height: var(--tap);
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  font-size: 16px;
+}
+
+.player-rate {
+  border-radius: 10px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.player-main {
+  min-width: 0;
+}
+
+.player-label {
+  font-size: 13px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.player-loading {
+  opacity: 0.7;
+}
+
+.player-seek {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.player-time {
+  font-size: 11px;
+  opacity: 0.8;
+  font-variant-numeric: tabular-nums;
+}
+
+.player-error {
+  font-size: 12px;
+  color: #ffb4ab;
+}
+
+/* --- 凸待ち箱 --- */
+.inbox-row {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.inbox-row.is-risky {
+  border-color: #ff9500;
+  box-shadow: 0 0 0 1px #ff9500 inset;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 4px 0;
+}
+
+.chip {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #eef1f6;
+  color: var(--text);
+}
+
+.chip.risk {
+  background: #fff4e5;
+  color: #a05a00;
+}
+
+.summary {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: #f8f8fa;
+  border: none;
+  border-radius: 8px;
+  padding: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.inbox-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.inbox-actions .primary-button,
+.inbox-actions .secondary-button {
+  min-height: 40px;
+  padding: 0 14px;
+}
+
+.aired-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.aired-badge {
+  display: inline-block;
+  margin: 4px 0;
+  font-size: 12px;
+  color: #6b21a8;
+}
+
+.transcription-panel {
+  font-size: 14px;
+}
+
+.inbox-notice {
+  background: #f3e8ff;
+  color: #4c1d95;
+}
+
+.key-text {
+  display: block;
+  word-break: break-all;
+  font-size: 15px;
+  padding: 8px;
+  margin: 6px 0;
+  background: #fff;
+  border-radius: 8px;
+  user-select: all;
+}
+
+.transcribe-controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.transcribe-controls .text-input {
+  flex: 1;
+}
+
+progress {
+  width: 100%;
+}
+
+.lab-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+
+.lab-table th,
+.lab-table td {
+  border-bottom: 1px solid var(--border);
+  padding: 6px 4px;
+  text-align: left;
+  vertical-align: top;
+  word-break: break-word;
+}
+
+.overlay-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* --- OBS オーバーレイ（背景透過） --- */
+html.overlay-mode,
+html.overlay-mode body,
+html.overlay-mode #root {
+  background: transparent;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 4vh 4vw;
+  color: #fff;
+  font-weight: 700;
+  text-shadow:
+    0 0 4px #000,
+    0 0 8px #000;
+}
+
+.overlay-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 0.5em;
+  padding: 0.4em 0.7em;
+}
+
+.overlay-from {
+  font-size: 0.6em;
+}
+
+.overlay-subtitle {
+  line-height: 1.4;
+}
+
+.overlay-status {
+  position: fixed;
+  top: 8px;
+  right: 8px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.foot-links {
+  display: flex;
+  gap: 12px;
+}
+
+/* --- 管理 --- */
+.admin-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.admin-actions {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.prose {
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+.prose h2 {
+  font-size: 16px;
+}
+
+/* --- 録音ボタン --- */
+.record-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.record-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #b42318;
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+}
+
+.record-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff3b30;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.record-button {
+  min-width: 72px;
+  min-height: 72px;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  background: #ff3b30;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  position: relative;
+  transition: transform 0.1s ease;
+}
+
+.record-button:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.record-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.record-button-inner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ffffff;
+  transition:
+    border-radius 0.15s ease,
+    width 0.15s ease,
+    height 0.15s ease;
+}
+
+.record-button.is-recording {
+  background: #ffffff;
+  border-color: #ff3b30;
+}
+
+.record-button.is-recording .record-button-inner {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background: #ff3b30;
+}
+
+.record-button-label {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* --- コンソールログ (デバッグ用、iPhone 向け) --- */
+.console-panel {
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 4px);
+  right: 4px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-end;
+  max-width: calc(100vw - 8px);
+}
+
+.console-toggle {
+  background: rgba(0, 0, 0, 0.7);
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.console-panel.is-open {
+  left: 4px;
+}
+
+.console-panel.is-open .console-toggle {
+  align-self: flex-start;
+}
+
+.console-actions {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+  justify-content: flex-end;
+}
+
+.console-btn {
+  background: #ffffff;
+  border: 1px solid #d1d1d6;
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 11px;
+  color: #1a1a1a;
+}
+
+.console-textarea {
+  width: 100%;
+  height: 40vh;
+  font-family: 'SF Mono', ui-monospace, 'Cascadia Mono', 'Roboto Mono', Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  padding: 10px 12px;
+  border: 1px solid #c6c6cc;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #1a1a1a;
+  resize: vertical;
+  white-space: pre-wrap;
+  word-break: break-all;
+  overflow-wrap: anywhere;
+  overflow-y: scroll;
+  scrollbar-width: auto;
+  scrollbar-color: #8e8e93 #f0f0f5;
+  -webkit-font-smoothing: antialiased;
+  user-select: text;
+  -webkit-user-select: text;
+  -webkit-touch-callout: default;
+}
+
+.console-textarea::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.console-textarea::-webkit-scrollbar-track {
+  background: #f0f0f5;
+  border-radius: 8px;
+}
+
+.console-textarea::-webkit-scrollbar-thumb {
+  background: #8e8e93;
+  border-radius: 8px;
+  border: 2px solid #f0f0f5;
+}
+
+.console-textarea::-webkit-scrollbar-thumb:hover {
+  background: #6e6e73;
+}
+
+/* --- PC（優先度低。中央寄せで幅を制限するだけ） --- */
+@media (min-width: 768px) {
+  .page,
+  .app-foot {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .fab-area {
+    display: flex;
+    justify-content: center;
+  }
+
+  .fab {
+    max-width: 608px;
+  }
+
+  .player-bar {
+    max-width: 624px;
+    margin: 0 auto;
+  }
+
+  .sheet-backdrop {
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sheet {
+    max-width: 560px;
+    border-radius: 18px;
+  }
+}

@@ -1,0 +1,16 @@
+node_modules
+dist
+data
+coverage
+playwright-report
+test-results
+backups
+.git
+.env
+.env.*
+**/*.test.ts
+**/*.test.tsx
+server/test
+e2e
+doc
+src

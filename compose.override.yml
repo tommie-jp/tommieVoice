@@ -1,0 +1,42 @@
+# 開発用（docker compose が自動で読み込む）。本番では使わない。
+# `docker compose up -d db` で DB だけを起動し、API と Vite はホストで動かす。
+# 4 コンテナ全部の本番リハーサル: `docker compose --profile full up --build`
+#
+# 下記の DB 認証情報はローカル開発専用。127.0.0.1 にしか公開しない。
+services:
+  db:
+    environment:
+      POSTGRES_USER: tommievoice
+      POSTGRES_PASSWORD: tommievoice-dev
+      POSTGRES_DB: tommievoice
+    ports:
+      - '127.0.0.1:5436:5432'
+
+  api:
+    profiles: ['full']
+    environment:
+      DATABASE_URL: postgres://tommievoice:tommievoice-dev@db:5432/tommievoice
+      PUBLIC_ORIGIN: http://127.0.0.1:8300
+      NODE_ENV: development
+      TRUST_PROXY_HOPS: '1'
+      ADMIN_TOKEN: dev-only-admin-token-000000000000000000
+      HASH_KEY: dev-only-hash-key-00000000000000000000000
+      SESSION_KEY: dev-only-session-key-000000000000000000
+      WORKER_TOKEN: dev-only-worker-token-00000000000000000
+      # ローカル検証では同じ端末から何度も投稿できるように緩める
+      RELAX_RATE_LIMITS: 'true'
+
+  worker:
+    profiles: ['full']
+    environment:
+      DATABASE_URL: postgres://tommievoice:tommievoice-dev@db:5432/tommievoice
+      PUBLIC_ORIGIN: http://127.0.0.1:8300
+      NODE_ENV: development
+      ADMIN_TOKEN: dev-only-admin-token-000000000000000000
+      HASH_KEY: dev-only-hash-key-00000000000000000000000
+      SESSION_KEY: dev-only-session-key-000000000000000000
+
+  web:
+    profiles: ['full']
+    ports:
+      - '127.0.0.1:8300:80'

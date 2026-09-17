@@ -1,0 +1,33 @@
+# VPS1 用の上書き。docker compose -f compose.yml -f compose.prod.yml ...
+# 80/443 はホスト nginx が持ち、web コンテナは 127.0.0.1:8300 にだけ公開する。
+
+x-prod: &prod
+  restart: unless-stopped
+  logging:
+    driver: json-file
+    options:
+      max-size: 10m
+      max-file: '3'
+
+services:
+  db:
+    <<: *prod
+    mem_limit: 256m
+
+  api:
+    <<: *prod
+    mem_limit: 256m
+    environment:
+      NODE_OPTIONS: --max-old-space-size=192
+
+  worker:
+    <<: *prod
+    mem_limit: 320m
+    environment:
+      NODE_OPTIONS: --max-old-space-size=192
+
+  web:
+    <<: *prod
+    mem_limit: 48m
+    ports:
+      - '127.0.0.1:8300:80'
