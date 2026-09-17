@@ -66,4 +66,4 @@ npm run lint && npm run typecheck
 
 ## ライセンス
 
-未定です。
+[MIT License](LICENSE)

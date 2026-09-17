@@ -2,6 +2,12 @@
   "name": "tommievoice",
   "private": true,
   "version": "0.1.3",
+  "license": "MIT",
+  "description": "声で書き込む掲示板。スマホから録音して投稿し、声で返事をする音声掲示板。",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tommie-jp/tommieVoice.git"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
